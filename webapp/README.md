@@ -3,16 +3,13 @@
 # Test task app
 
 ## Запуск проекта с помощью **docker-compose**
-Склонируйте проект
+* Склонируйте проект
 
-Выполните команду 
-```bash
-docker-compose up --build
-```
-или
-```bash
-docker compose up --build
-```
+* Создайте новый образ и запустите два контейнера:
+```docker-compose up -d --build```
+
+* Запустите миграции:
+```docker-compose exec web_app python manage.py migrate --noinput```
 
 ## Установка и запуск
 Склонируйте проект
