@@ -8,14 +8,6 @@ import openpyxl
 from wb_app.settings import URL_WB
 
 
-# def get_cards_from_wb_list(articles: list):
-#     cards_list = []
-#     for i in articles:
-#         r = requests.get(f"{str(URL_WB)}{i}")
-#         cards_list.append(r.json())
-#     return cards_list
-
-
 def xlsx_to_list(request):
     file_uploaded = request.FILES.get("file")
     file_name = file_uploaded.name
