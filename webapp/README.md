@@ -9,7 +9,7 @@
 ```docker-compose up -d --build```
 
 * Запустите миграции:
-```docker-compose exec web_app python manage.py migrate --noinput```
+```docker-compose exec wb_app python manage.py migrate --noinput```
 
 ## Установка и запуск
 Склонируйте проект
