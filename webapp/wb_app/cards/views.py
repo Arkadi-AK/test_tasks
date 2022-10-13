@@ -24,7 +24,6 @@ class CardAPIList(ViewSet):
             list_of_articles.append(article)
         else:
             list_of_articles = xlsx_to_list(request)
-        # wb_full_list = get_cards_from_wb_list(list_of_articles)
         wb_full_list = wb_parser(list_of_articles)
 
         for i in wb_full_list:
