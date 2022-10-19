@@ -1,47 +1,28 @@
-import json
-
-from pydantic import ValidationError
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet
+from rest_framework.views import APIView
 
-from cards.pydantic_json import Card
-from cards.serializer import UploadExelSerializer
-from cards.wb import xlsx_to_list, wb_parser
+from cards.serializer import ArticleSerializer, FileExelSerializer
+from cards.wb_parser import parser, xlsx_to_list
 
 
-class CardAPIList(ViewSet):
-    serializer_class = UploadExelSerializer
+class CardArticleAPIList(APIView):
+    serializer_class = ArticleSerializer
 
-    def list(self, request):
-        art = 0
-        cards = []
-        list_of_articles = []
-        up_file = request.FILES.get("file")
-        article = request.data["article"]
-        if up_file is None and article == "":
-            return Response("Выберите файл или введите артикул")
-        elif up_file is None:
-            list_of_articles.append(article)
-        else:
-            list_of_articles = xlsx_to_list(request)
-        wb_full_list = wb_parser(list_of_articles)
+    def post(self, request):
+        article_serializer = ArticleSerializer(data=request.data)
+        article_serializer.is_valid(raise_exception=True)
+        article = article_serializer.validated_data["article"]
+        result = parser([article])
+        return Response(result, status=status.HTTP_200_OK)
 
-        for i in wb_full_list:
-            if i["data"]["products"] == []:
-                wb = [{
-                    "id": f"{list_of_articles[art]}",
-                    "name": "Нет информации по артикулу",
-                    "brand": "Нет информации по артикулу"
-                }]
-            else:
-                wb = i["data"]["products"]
-            art += 1
-            data = json.dumps(*wb, ensure_ascii=False)
-            try:
-                card = Card.parse_raw(data)
-                card_json = json.loads(card.json(ensure_ascii=False, ))
-                cards.append(card_json)
-            except ValidationError as e:
-                return Response({e.json()})
 
-        return Response([c for c in cards])
+class CardFileAPIList(APIView):
+    serializer_class = FileExelSerializer
+
+    def post(self, request):
+        article_serializer = FileExelSerializer(data=request.FILES)
+        article_serializer.is_valid(raise_exception=True)
+        list_of_articles = xlsx_to_list(request)
+        result = parser(list_of_articles)
+        return Response(result, status=status.HTTP_200_OK)

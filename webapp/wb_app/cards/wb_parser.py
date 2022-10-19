@@ -5,6 +5,7 @@ from io import BytesIO
 import aiohttp
 import openpyxl
 
+from cards.models import CardModel
 from wb_app.settings import URL_WB
 
 
@@ -29,7 +30,7 @@ def xlsx_to_list(request):
     return articles
 
 
-async def get_data_from_url(url):
+async def parse_data_from_url(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url) as resp:
             if resp.status == 200:
@@ -37,16 +38,17 @@ async def get_data_from_url(url):
                 return product_data
 
 
-def wb_parser(list_of_articles):
+def parser(list_of_articles):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     cards_list = []
     for article in list_of_articles:
-        task = get_data_from_url(f"{str(URL_WB)}{article}")
+        task = parse_data_from_url(f"{str(URL_WB)}{article}")
         cards_list.append(task)
     results = loop.run_until_complete(asyncio.gather(*cards_list))
     result = []
     for i in results:
-        parsed = json.loads(i)
-        result.append(parsed)
+        card = CardModel.parse_raw(i)
+        card_json = json.loads(card.json(ensure_ascii=False, ))
+        result.append(card_json)
     return result

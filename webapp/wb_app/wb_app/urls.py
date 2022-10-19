@@ -16,10 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from cards.views import CardAPIList
+from cards.views import CardArticleAPIList, CardFileAPIList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/v1/cards/', CardAPIList.as_view({'post': 'list'})),
+    path('api/v1/card/', CardArticleAPIList.as_view()),
+    path('api/v1/cards/', CardFileAPIList.as_view()),
 ]
